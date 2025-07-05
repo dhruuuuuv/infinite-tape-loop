@@ -85,6 +85,26 @@ header h1 a {
   transition: none !important;
 }
 
+/* Container for drawings, add a class or use a selector you prefer */
+.drawing-img {
+  max-width: 100%;
+  height: auto;
+  transition: filter 0.3s ease;
+  /* Optional styling */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+}
+
+/* Dark mode styles using prefers-color-scheme */
+@media (prefers-color-scheme: dark) {
+  .drawing-img {
+    /* Invert colours for images with white backgrounds or outlines */
+    filter: invert(1) hue-rotate(180deg);
+    /* Adjust brightness/saturation if needed */
+    /* filter: invert(1) hue-rotate(180deg) brightness(1.1) saturate(1.2); */
+  }
+}
+
 .dark-mode-init .toggle-input:checked + .toggle-label .toggle-slider {
   transform: translateX(20px);
 }
