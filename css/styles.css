@@ -23,7 +23,8 @@
   --bg-color: #f0efea;
   --text-color: #141413;
   --border-color: #e6e4dd;
-  --footnote-bg-color: rgba(0, 0, 0, 0.08);
+  --accent-color: orange;
+  --footnote-bg-color: rgba(18, 15, 15, 0.08);
   --footnote-hover-bg-color: rgba(0, 0, 0, 0.15);
   --tooltip-bg-color: #f9f9f9;
   --tooltip-text-color: #333;
@@ -596,4 +597,68 @@ footer {
   height: auto;
   display: block;
   margin: 1em auto;
+}
+
+/* Sticky footer layout */
+html, body {
+  height: 100%;
+}
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+main.content-wrapper {
+  flex: 1 0 auto;
+}
+footer {
+  flex-shrink: 0;
+}
+
+details {
+  padding: 0.5em 0em;
+  margin: 1.5em 0;
+  border-radius: 4px;
+  position: relative;
+  transition: border-color 0.2s;
+  overflow: hidden;
+  background: none;
+}
+details > summary {
+  cursor: pointer;
+  font-weight: 600;
+  outline: none;
+  list-style: none;
+  position: relative;
+  transition: color 0.2s;
+  background: none;
+}
+details > summary::-webkit-details-marker {
+  display: none;
+}
+details > summary:before {
+  content: "▶";
+  display: inline-block;
+  margin-right: 0.5em;
+  transition: transform 0.2s;
+}
+details[open] > summary:before {
+  transform: rotate(90deg);
+}
+details > .details-content {
+  border-left: 4px solid transparent;
+  opacity: 0;
+  max-height: 0;
+  transition: opacity 0.2s cubic-bezier(.4,0,.2,1), max-height 0.4s cubic-bezier(.4,0,.2,1), border-color 0.2s;
+  will-change: opacity, max-height, border-color;
+  position: relative;
+  padding-left: 0.1em; 
+}
+details[open] > .details-content {
+  margin: 1em;
+  border-left: 4px solid var(--accent-color);
+  padding-left: 1em;
+  opacity: 1;
+  max-height: 1000px;
+  transition: opacity 0.4s cubic-bezier(.4,0,.2,1), max-height 0.5s cubic-bezier(.4,0,.2,1), border-color 0.2s;
 }
