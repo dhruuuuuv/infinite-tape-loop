@@ -74,34 +74,25 @@ document.addEventListener('DOMContentLoaded', function() {
             let startX, startY, initialX, initialY;
 
             function updateTransform() {
-                // When zoomed, allow image to expand beyond original bounds
+                // Apply scale transform instead of changing dimensions
+                expandedImg.style.transform = `scale(${scale}) translate(${translateX / scale}px, ${translateY / scale}px)`;
+                expandedImg.style.cursor = scale > 1 ? 'grab' : 'zoom-in';
+
                 if (scale > 1) {
                     expandedImg.classList.add('zoomed');
-                    expandedImg.style.maxWidth = 'none';
-                    expandedImg.style.maxHeight = 'none';
-                    // Calculate size based on viewport and scale
-                    const baseSize = Math.min(window.innerWidth * 0.9, window.innerHeight * 0.9);
-                    expandedImg.style.width = `${baseSize * scale}px`;
-                    expandedImg.style.height = 'auto';
                 } else {
                     expandedImg.classList.remove('zoomed');
-                    expandedImg.style.maxWidth = '90vw';
-                    expandedImg.style.maxHeight = '90vh';
-                    expandedImg.style.width = 'auto';
-                    expandedImg.style.height = 'auto';
                 }
-                expandedImg.style.transform = `translate(${translateX}px, ${translateY}px)`;
-                expandedImg.style.cursor = scale > 1 ? 'grab' : 'zoom-in';
             }
 
             // Zoom controls
             zoomInBtn.addEventListener('click', () => {
-                scale = Math.min(scale * 1.4, 4);
+                scale = Math.min(scale * 1.5, 3);
                 updateTransform();
             });
 
             zoomOutBtn.addEventListener('click', () => {
-                scale = Math.max(scale / 1.4, 1);
+                scale = Math.max(scale / 1.5, 1);
                 if (scale === 1) {
                     translateX = 0;
                     translateY = 0;
@@ -134,7 +125,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 e.preventDefault();
 
                 const delta = e.deltaY > 0 ? 0.9 : 1.1;
-                const newScale = Math.min(Math.max(scale * delta, 1), 4);
+                const newScale = Math.min(Math.max(scale * delta, 1), 3);
 
                 if (newScale !== scale) {
                     scale = newScale;
@@ -199,7 +190,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         e.touches[0].clientX - e.touches[1].clientX,
                         e.touches[0].clientY - e.touches[1].clientY
                     );
-                    scale = Math.min(Math.max(initialScale * (distance / initialDistance), 1), 4);
+                    scale = Math.min(Math.max(initialScale * (distance / initialDistance), 1), 3);
                     if (scale === 1) {
                         translateX = 0;
                         translateY = 0;

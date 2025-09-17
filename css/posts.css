@@ -235,7 +235,7 @@
     border-radius: 8px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
     cursor: zoom-in;
-    transition: all 0.2s ease;
+    transition: transform 0.2s ease;
     transform-origin: center;
     transform: scale(0.8);
     position: relative;
@@ -343,12 +343,6 @@
     .expanded-image {
         max-width: 95vw;
         max-height: 80vh;
-    }
-
-    /* Allow full viewport zoom on mobile too */
-    .expanded-image.zoomed {
-        max-width: none;
-        max-height: none;
     }
 
     .close-button {
