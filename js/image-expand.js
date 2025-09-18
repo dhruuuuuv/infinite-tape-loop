@@ -1,7 +1,7 @@
 // Enhanced image expand functionality with zoom
 document.addEventListener('DOMContentLoaded', function() {
     // Target only content images, not header images
-    const contentImages = document.querySelectorAll('.content-container img:not(.project-header-image img)');
+    const contentImages = document.querySelectorAll('.content-container img:not(.project-header-image img), .image-figure img');
 
     contentImages.forEach(function(img) {
         // Add cursor pointer to indicate clickability
@@ -225,7 +225,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // Close on overlay click (but not on image or controls)
             overlay.addEventListener('click', function(e) {
-                if (e.target === overlay) {
+                // Close if clicked on overlay, image container, or anywhere that's not the image or controls
+                const isImageClick = expandedImg.contains(e.target) || e.target === expandedImg;
+                const isControlsClick = zoomControls.contains(e.target) || closeBtn.contains(e.target) || e.target === closeBtn;
+
+                if (!isImageClick && !isControlsClick) {
                     closeOverlay();
                 }
             });
