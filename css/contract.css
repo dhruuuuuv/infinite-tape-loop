@@ -1,0 +1,240 @@
+/* Contract Page Styles */
+
+body:has(.contract-page) {
+  background-color: var(--bg-color);
+}
+
+.contract-page {
+  background-color: var(--bg-color);
+  min-height: 100vh;
+  padding-top: 3em;
+  padding-bottom: 4em;
+}
+
+/* Hero Section */
+.contract-hero {
+  margin-bottom: 3em;
+  padding-bottom: 2em;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.contract-name {
+  font-size: 2.4em;
+  margin-bottom: 0.1em;
+  margin-top: 0.5em;
+}
+
+.contract-title {
+  font-size: 1.3em;
+  font-weight: 500;
+  margin: 0 0 1em 0;
+  opacity: 0.85;
+}
+
+.contract-positioning {
+  font-size: 1.1em;
+  line-height: 1.6;
+  margin-bottom: 1em;
+  max-width: 580px;
+}
+
+.contract-location {
+  font-size: 0.95em;
+  opacity: 0.7;
+  margin-bottom: 1.5em;
+}
+
+.contract-cta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1em;
+}
+
+.availability-badge {
+  display: inline-block;
+  padding: 0.5em 1.4em;
+  background-color: transparent;
+  color: var(--text-color);
+  border: 1.5px solid var(--text-color);
+  border-radius: 50px;
+  font-size: 0.8em;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  opacity: 0.7;
+}
+
+.cta-email {
+  font-size: 1em;
+  font-weight: 500;
+}
+
+/* Sections */
+.contract-section {
+  margin-bottom: 2.5em;
+}
+
+.contract-section h2 {
+  font-size: 1.4em;
+  margin-bottom: 0.8em;
+  font-weight: 600;
+}
+
+/* Outcomes List */
+.outcomes-list {
+  padding-left: 1.2em;
+  margin: 0;
+}
+
+.outcomes-list li {
+  margin-bottom: 0.5em;
+  line-height: 1.5;
+}
+
+.outcomes-list li::marker {
+  color: var(--text-color);
+  opacity: 0.5;
+}
+
+/* Experience */
+.experience-item {
+  margin-bottom: 1.8em;
+  padding-bottom: 1.5em;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.experience-item:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.experience-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.5em;
+  margin-bottom: 0.2em;
+}
+
+.experience-company {
+  font-weight: 600;
+  font-size: 1.1em;
+}
+
+.experience-dates {
+  font-size: 0.9em;
+  opacity: 0.7;
+}
+
+.experience-role {
+  font-style: italic;
+  margin: 0.2em 0 0.6em 0;
+  opacity: 0.85;
+  font-size: 0.95em;
+}
+
+.experience-description {
+  margin: 0;
+  line-height: 1.6;
+  font-size: 0.95em;
+}
+
+/* Technical Stack */
+.stack-grid {
+  display: grid;
+  gap: 0.8em;
+}
+
+.stack-category {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5em;
+  align-items: baseline;
+}
+
+.stack-label {
+  font-weight: 600;
+  min-width: 100px;
+  font-size: 0.95em;
+}
+
+.stack-items {
+  opacity: 0.85;
+  font-size: 0.95em;
+}
+
+/* Working Style */
+.working-style-text {
+  line-height: 1.7;
+  max-width: 580px;
+}
+
+/* Contact Section */
+.contract-contact {
+  margin-top: 3em;
+  padding-top: 2em;
+  border-top: 1px solid var(--border-color);
+}
+
+.contact-availability {
+  margin-bottom: 1em;
+  font-weight: 500;
+}
+
+.contact-links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5em;
+}
+
+.contact-links li {
+  margin: 0;
+}
+
+.contact-links a {
+  font-weight: 500;
+}
+
+/* Mobile Adjustments */
+@media (max-width: 600px) {
+  .contract-name {
+    font-size: 2em;
+  }
+
+  .contract-title {
+    font-size: 1.1em;
+  }
+
+  .contract-positioning {
+    font-size: 1em;
+  }
+
+  .contract-cta {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .experience-header {
+    flex-direction: column;
+    gap: 0.1em;
+  }
+
+  .stack-category {
+    flex-direction: column;
+    gap: 0.2em;
+  }
+
+  .stack-label {
+    min-width: auto;
+  }
+
+  .contact-links {
+    flex-direction: column;
+    gap: 0.8em;
+  }
+}
