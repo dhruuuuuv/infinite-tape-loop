@@ -1,61 +1,46 @@
-/* Progressive Image Loading Styles */
+/* Progressive Image Loading - Enhanced Skeleton */
 .progressive-image-wrapper {
   position: relative;
   display: block;
   overflow: hidden;
-  background: #f5f5f5;
   border-radius: 8px;
   min-height: 200px;
+  background: var(--skeleton-bg, #f8f9fa);
+  transition: background-color 0.3s ease;
 }
 
-/* Static placeholder for shortcode images */
-.static-placeholder {
+/* Base64 blur placeholder */
+.blur-placeholder {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, #f0f0f0, #e0e0e0, #f0f0f0);
-  background-size: 200% 100%;
-  animation: shimmer 2s infinite;
-  z-index: 1;
-  opacity: 1;
-  transition: opacity 0.4s ease;
-}
-
-/* Placeholder blur effect */
-.placeholder-image {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   filter: blur(20px) saturate(1.2);
   transform: scale(1.1);
-  transition: opacity 0.4s ease, transform 0.4s ease;
+  opacity: 0.8;
   z-index: 1;
-}
-
-/* Main image */
-.main-image {
-  position: relative;
-  width: 100%;
-  height: auto;
-  opacity: 0;
   transition: opacity 0.4s ease;
+}
+
+/* Sophisticated skeleton loader */
+.skeleton-loader {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   z-index: 2;
-  display: block;
-  transform: translateZ(0); /* Force hardware acceleration */
-}
-
-.main-image.loaded {
   opacity: 1;
+  transition: opacity 0.3s ease;
+  overflow: hidden;
+  background: var(--skeleton-bg, #f8f9fa);
 }
 
-/* Loading skeleton shimmer effect */
-.progressive-image-wrapper::before {
-  content: '';
+.skeleton-shimmer {
   position: absolute;
   top: 0;
   left: -100%;
@@ -63,21 +48,121 @@
   height: 100%;
   background: linear-gradient(
     90deg,
-    transparent,
-    rgba(255, 255, 255, 0.4),
-    transparent
+    transparent 0%,
+    var(--skeleton-shimmer, rgba(255, 255, 255, 0.6)) 50%,
+    transparent 100%
   );
   animation: shimmer 2s infinite ease-in-out;
+  z-index: 1;
+}
+
+.skeleton-content {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  box-sizing: border-box;
+  z-index: 2;
+}
+
+.skeleton-lines {
+  width: 60%;
+  max-width: 200px;
+  margin-bottom: 1rem;
+}
+
+.skeleton-line {
+  height: 8px;
+  background: var(--skeleton-line, rgba(0, 0, 0, 0.1));
+  border-radius: 4px;
+  margin-bottom: 8px;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.skeleton-line-1 {
+  width: 100%;
+  animation-delay: 0s;
+}
+
+.skeleton-line-2 {
+  width: 85%;
+  animation-delay: 0.2s;
+}
+
+.skeleton-line-3 {
+  width: 70%;
+  animation-delay: 0.4s;
+}
+
+.skeleton-pulse {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--skeleton-pulse, rgba(0, 0, 0, 0.12));
+  animation: pulse-circle 1.2s ease-in-out infinite;
+}
+
+/* Main image */
+.main-image,
+.main-picture {
+  position: relative;
+  width: 100%;
+  height: auto;
+  opacity: 0;
+  transition: opacity 0.4s ease;
   z-index: 3;
+  display: block;
+}
+
+.main-image.loaded,
+.progressive-image-wrapper.loaded .main-picture,
+.main-picture:has(> .main-image.loaded) {
+  opacity: 1;
+}
+
+/* Hide skeleton when image is loaded — but keep it visible in the error state,
+   since handleImageError writes the failure message into it */
+.progressive-image-wrapper.loaded:not(.error) .skeleton-loader {
+  opacity: 0;
   pointer-events: none;
 }
 
-.main-image.loaded ~ .progressive-image-wrapper::before,
-.progressive-image-wrapper:has(.main-image.loaded)::before {
+.progressive-image-wrapper.loaded .blur-placeholder {
   opacity: 0;
-  animation: none;
+  pointer-events: none;
 }
 
+/* Error state */
+.skeleton-loader.error {
+  background: var(--skeleton-error-bg, rgba(239, 68, 68, 0.1));
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.error-icon {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.error-text {
+  font-size: 0.875rem;
+  color: var(--skeleton-error-text, #ef4444);
+  font-weight: 500;
+}
+
+.main-image.error {
+  opacity: 0.3;
+  filter: grayscale(1);
+}
+
+/* Animations */
 @keyframes shimmer {
   0% {
     left: -100%;
@@ -92,82 +177,61 @@
   }
 }
 
-/* Loading indicator */
-.progressive-image-wrapper::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 40px;
-  height: 40px;
-  margin: -20px 0 0 -20px;
-  border: 3px solid rgba(0, 0, 0, 0.1);
-  border-top: 3px solid var(--accent-color, #007acc);
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  z-index: 4;
-  opacity: 1;
-  transition: opacity 0.3s ease;
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.4;
+    transform: scaleX(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scaleX(1.02);
+  }
 }
 
-.main-image.loaded ~ .progressive-image-wrapper::after,
-.progressive-image-wrapper:has(.main-image.loaded)::after {
-  opacity: 0;
+@keyframes pulse-circle {
+  0%, 100% {
+    opacity: 0.4;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.1);
+  }
 }
 
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+/* CSS Variables for theming */
+.progressive-image-wrapper {
+  --skeleton-bg: #f8f9fa;
+  --skeleton-shimmer: rgba(255, 255, 255, 0.6);
+  --skeleton-line: rgba(0, 0, 0, 0.1);
+  --skeleton-pulse: rgba(0, 0, 0, 0.12);
+  --skeleton-error-bg: rgba(239, 68, 68, 0.1);
+  --skeleton-error-text: #ef4444;
 }
 
-/* Error state */
-.main-image.error {
-  opacity: 1;
-  filter: grayscale(1);
+/* Dark mode adjustments (.dark-mode is the legacy hook; [data-theme] is the current one) */
+.dark-mode .progressive-image-wrapper,
+:root[data-theme="dark"] .progressive-image-wrapper {
+  --skeleton-bg: #1f2937;
+  --skeleton-shimmer: rgba(255, 255, 255, 0.1);
+  --skeleton-line: rgba(255, 255, 255, 0.15);
+  --skeleton-pulse: rgba(255, 255, 255, 0.2);
+  --skeleton-error-bg: rgba(239, 68, 68, 0.2);
+  --skeleton-error-text: #fca5a5;
 }
 
-.progressive-image-wrapper.error::after {
-  content: '⚠️';
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
-  width: auto;
-  height: auto;
-  border: none;
-  animation: none;
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: 4px;
-  padding: 8px;
-}
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .progressive-image-wrapper {
+    --skeleton-line: rgba(0, 0, 0, 0.3);
+    --skeleton-pulse: rgba(0, 0, 0, 0.4);
+  }
 
-/* Dark mode adjustments */
-.dark-mode .progressive-image-wrapper {
-  background: #2a2a2a;
-}
-
-.dark-mode .static-placeholder {
-  background: linear-gradient(90deg, #333, #222, #333);
-  background-size: 200% 100%;
-}
-
-.dark-mode .progressive-image-wrapper::before {
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.1),
-    transparent
-  );
-}
-
-.dark-mode .progressive-image-wrapper::after {
-  border-color: rgba(255, 255, 255, 0.2);
-  border-top-color: var(--accent-color, #4fa8e0);
-}
-
-.dark-mode .progressive-image-wrapper.error::after {
-  background: rgba(42, 42, 42, 0.9);
-  color: #fff;
+  .dark-mode .progressive-image-wrapper,
+  :root[data-theme="dark"] .progressive-image-wrapper {
+    --skeleton-line: rgba(255, 255, 255, 0.4);
+    --skeleton-pulse: rgba(255, 255, 255, 0.5);
+  }
 }
 
 /* Responsive adjustments */
@@ -177,102 +241,73 @@
     min-height: 150px;
   }
 
-  .progressive-image-wrapper::after {
-    width: 30px;
-    height: 30px;
-    margin: -15px 0 0 -15px;
-    border-width: 2px;
+  .skeleton-content {
+    padding: 1.5rem;
+  }
+
+  .skeleton-lines {
+    width: 70%;
+  }
+
+  .skeleton-pulse {
+    width: 32px;
+    height: 32px;
   }
 }
 
-/* Intersection Observer fade-in animation */
-.image-figure[data-aos] {
-  opacity: 0;
-  transform: translateY(30px);
-  transition: opacity 0.6s ease, transform 0.6s ease;
-}
-
-.image-figure[data-aos].aos-animate {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* Prefers reduced motion */
+/* Reduced motion support */
 @media (prefers-reduced-motion: reduce) {
-  .progressive-image-wrapper::before,
-  .progressive-image-wrapper::after,
-  .placeholder-image,
-  .main-image,
-  .image-figure[data-aos] {
-    animation: none;
-    transition: none;
+  .skeleton-shimmer,
+  .skeleton-line,
+  .skeleton-pulse,
+  .blur-placeholder,
+  .main-image {
+    animation: none !important;
+    transition: none !important;
   }
 
   .main-image {
-    opacity: 1;
+    opacity: 1 !important;
   }
 
-  .placeholder-image {
-    display: none;
-  }
-}
-
-/* High contrast mode */
-@media (prefers-contrast: high) {
-  .progressive-image-wrapper {
-    border: 2px solid currentColor;
-  }
-
-  .progressive-image-wrapper::after {
-    border-color: currentColor;
-    border-top-color: transparent;
+  .skeleton-loader {
+    display: none !important;
   }
 }
 
 /* Focus states for accessibility */
 .progressive-image-wrapper:focus-within {
-  outline: 2px solid var(--accent-color, #007acc);
+  outline: 2px solid var(--accent-color, #3b82f6);
   outline-offset: 2px;
 }
 
-/* Hover effects for interactive images */
-.content-container .progressive-image-wrapper {
+/* Image figure spacing */
+.image-figure {
+  margin: 2.5em auto;
+  padding: 1.5em 0;
+  text-align: center;
+  max-width: 100%;
+}
+
+@media (max-width: 600px) {
+  .image-figure {
+    margin: 2em auto;
+    padding: 1em 0;
+  }
+}
+
+/* Legacy placeholder support - hide old static placeholders */
+.static-placeholder {
+  display: none;
+}
+
+/* Content images cursor pointer - updated for new structure */
+.content-container img:not(.project-header-image .main-image):not(.image-figure .main-image) {
   cursor: zoom-in;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: all 0.2s ease;
 }
 
-.content-container .progressive-image-wrapper:hover {
-  transform: scale(1.01);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-}
-
-.dark-mode .content-container .progressive-image-wrapper:hover {
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
-}
-
-/* Lazy loading enhancement */
-.main-image[loading="lazy"] {
-  content-visibility: auto;
-  contain-intrinsic-size: 200px;
-}
-
-/* WebP support detection fallback */
-.no-webp .main-image[data-webp] {
-  content: attr(data-fallback);
-}
-
-/* Print styles */
-@media print {
-  .progressive-image-wrapper::before,
-  .progressive-image-wrapper::after {
-    display: none;
-  }
-
-  .placeholder-image {
-    display: none;
-  }
-
-  .main-image {
-    opacity: 1;
-  }
+.content-container img:not(.project-header-image .main-image):not(.image-figure .main-image):hover {
+  opacity: 0.9;
+  transform: scale(1.02);
 }

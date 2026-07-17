@@ -1,15 +1,23 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Place on dhruv</title><link>https://dhruvc.com/tags/place/</link><description>Recent content in Place on dhruv</description><generator>Hugo</generator><language>en-gb</language><lastBuildDate>Thu, 01 May 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://dhruvc.com/tags/place/index.xml" rel="self" type="application/rss+xml"/><item><title>Where Everything is Music</title><link>https://dhruvc.com/projects/where-everything-is-music/</link><pubDate>Thu, 01 May 2025 00:00:00 +0000</pubDate><guid>https://dhruvc.com/projects/where-everything-is-music/</guid><description>&lt;h2 id="overview">Overview&lt;/h2>
-&lt;p>Where Everything is Music is an experiment in interaction with musical lineage.&lt;/p>
-&lt;figure class="image-figure ">
- &lt;div class="progressive-image-wrapper">
- &lt;div class="static-placeholder">&lt;/div>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Place on dhruv</title><link>https://dhruvc.com/tags/place/</link><description>Recent content in Place on dhruv</description><generator>Hugo</generator><language>en-gb</language><lastBuildDate>Thu, 01 May 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://dhruvc.com/tags/place/index.xml" rel="self" type="application/rss+xml"/><item><title>Where Everything is Music</title><link>https://dhruvc.com/projects/where-everything-is-music/</link><pubDate>Thu, 01 May 2025 00:00:00 +0000</pubDate><guid>https://dhruvc.com/projects/where-everything-is-music/</guid><description>&lt;h2 id="overview"&gt;Overview&lt;/h2&gt;
+&lt;p&gt;Where Everything is Music is an experiment in interaction with musical lineage.&lt;/p&gt;
+&lt;figure class="image-figure " data-loading="true"&gt;
+ &lt;div class="progressive-image-wrapper" data-has-resource="false"&gt;
+ &lt;div class="skeleton-loader"&gt;
+ &lt;div class="skeleton-shimmer"&gt;&lt;/div&gt;
+ &lt;div class="skeleton-content"&gt;
+ &lt;div class="skeleton-lines"&gt;
+ &lt;div class="skeleton-line skeleton-line-1"&gt;&lt;/div&gt;
+ &lt;div class="skeleton-line skeleton-line-2"&gt;&lt;/div&gt;
+ &lt;div class="skeleton-line skeleton-line-3"&gt;&lt;/div&gt;
+ &lt;/div&gt;
+ &lt;div class="skeleton-pulse"&gt;&lt;/div&gt;
+ &lt;/div&gt;
+ &lt;/div&gt;
+
  &lt;img
  class="main-image" loading="lazy"
  src="https://dhruvc.com/images/weim/weim-ps-1.jpg"
  alt="Product demonstration of where everything is music"
- onload="this.classList.add('loaded'); this.previousElementSibling.style.opacity='0';"
- >
- &lt;/div>&lt;figcaption class="image-caption">photo credits Sham Ahmed&lt;/figcaption>&lt;/figure>
+ &gt;&lt;/div&gt;&lt;figcaption class="image-caption"&gt;photo credits Sham Ahmed&lt;/figcaption&gt;&lt;/figure&gt;
 
-&lt;p>It was created out of a manifold desire to encourage curiosity into both music itself, and how music, and its lineage can sometimes be used as a lens to explore cultural history, and the complex ways in which geographies are woven together.&lt;/p>
-&lt;p>It also was created out of a desire for greater interaction and impact with music - something that is increasingly becoming fungible and transient to some.&lt;/p></description></item></channel></rss>
+&lt;p&gt;It was created out of a manifold desire to encourage curiosity into both music itself, and how music, and its lineage can sometimes be used as a lens to explore cultural history, and the complex ways in which geographies are woven together.&lt;/p&gt;</description></item></channel></rss>

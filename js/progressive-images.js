@@ -1,7 +1,8 @@
-// Progressive Image Loading with Intersection Observer
-class ProgressiveImageLoader {
+// Enhanced Progressive Image Loading with Skeleton Loader
+class SkeletonImageLoader {
     constructor() {
         this.imageObserver = null;
+        this.loadedImages = new Set();
         this.init();
     }
 
@@ -19,20 +20,26 @@ class ProgressiveImageLoader {
 
         // Listen for dynamic content changes
         this.observeMutations();
+
+        // Add global image event listeners
+        this.addGlobalEventListeners();
     }
 
     setupIntersectionObserver() {
         const options = {
             root: null,
-            rootMargin: '50px 0px', // Start loading 50px before entering viewport
+            rootMargin: '100px 0px', // Start loading 100px before entering viewport
             threshold: 0.01
         };
 
         this.imageObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
-                    this.loadImage(entry.target);
-                    this.imageObserver.unobserve(entry.target);
+                    const img = entry.target;
+                    if (!this.loadedImages.has(img)) {
+                        this.loadImage(img);
+                    }
+                    this.imageObserver.unobserve(img);
                 }
             });
         }, options);
@@ -44,95 +51,121 @@ class ProgressiveImageLoader {
     observeImages() {
         const lazyImages = document.querySelectorAll('.main-image[loading="lazy"]:not(.loaded)');
         lazyImages.forEach(img => {
-            if (!img.classList.contains('observed')) {
+            if (!img.hasAttribute('data-observed')) {
                 this.imageObserver.observe(img);
-                img.classList.add('observed');
+                img.setAttribute('data-observed', 'true');
             }
         });
     }
 
     loadImage(img) {
         const wrapper = img.closest('.progressive-image-wrapper');
-        const placeholder = wrapper?.querySelector('.placeholder-image');
+        const figure = img.closest('.image-figure');
 
-        // Set up loading state
+        if (this.loadedImages.has(img)) return;
+
+        // Mark as loading
         if (wrapper) {
-            wrapper.classList.add('loading');
+            wrapper.setAttribute('data-loading', 'true');
         }
 
-        // Create a new image to preload
-        const imageLoader = new Image();
+        // Add load event listener
+        img.addEventListener('load', () => this.handleImageLoad(img), { once: true });
+        img.addEventListener('error', () => this.handleImageError(img), { once: true });
 
-        imageLoader.onload = () => {
-            // Image loaded successfully
-            img.src = imageLoader.src;
+        // If image is already cached, it might load immediately
+        if (img.complete && img.naturalHeight !== 0) {
+            this.handleImageLoad(img);
+        }
+    }
+
+    handleImageLoad(img) {
+        const wrapper = img.closest('.progressive-image-wrapper');
+        const figure = img.closest('.image-figure');
+        const skeleton = wrapper?.querySelector('.skeleton-loader');
+        const placeholder = wrapper?.querySelector('.blur-placeholder');
+
+        // Mark as loaded
+        this.loadedImages.add(img);
+
+        // Add loaded class with slight delay for smooth transition
+        setTimeout(() => {
             img.classList.add('loaded');
-
             if (wrapper) {
-                wrapper.classList.remove('loading');
                 wrapper.classList.add('loaded');
+                wrapper.setAttribute('data-loading', 'false');
+            }
+            if (figure) {
+                figure.setAttribute('data-loading', 'false');
             }
 
-            // Fade out placeholder
+            // Hide skeleton with animation
+            if (skeleton) {
+                skeleton.style.opacity = '0';
+                setTimeout(() => {
+                    skeleton.style.display = 'none';
+                }, 300);
+            }
+
+            // Hide placeholder with animation
             if (placeholder) {
                 placeholder.style.opacity = '0';
                 setTimeout(() => {
                     placeholder.style.display = 'none';
-                }, 300);
+                }, 400);
             }
 
             // Trigger custom event
             img.dispatchEvent(new CustomEvent('imageLoaded', {
                 bubbles: true,
-                detail: { src: imageLoader.src }
+                detail: { src: img.src }
             }));
-        };
 
-        imageLoader.onerror = () => {
-            // Handle loading error
-            this.handleImageError(img, wrapper, placeholder);
-        };
-
-        // Start loading
-        const src = img.dataset.src || img.src;
-        if (src && src !== img.src) {
-            imageLoader.src = src;
-        } else {
-            // Image is already loaded or no data-src
-            img.classList.add('loaded');
-            if (wrapper) {
-                wrapper.classList.add('loaded');
-            }
-        }
+        }, 50); // Small delay to ensure smooth transition
     }
 
-    handleImageError(img, wrapper, placeholder) {
-        console.warn('Failed to load image:', img.dataset.src || img.src);
+    handleImageError(img) {
+        const wrapper = img.closest('.progressive-image-wrapper');
+        const figure = img.closest('.image-figure');
+        const skeleton = wrapper?.querySelector('.skeleton-loader');
 
-        // Try fallback src if available
-        const fallbackSrc = img.dataset.fallback;
-        if (fallbackSrc && fallbackSrc !== img.src) {
-            img.src = fallbackSrc;
+        console.warn('Failed to load image:', img.src);
+
+        // Try fallback if available. Inside a <picture>, matching <source>
+        // elements would still win over a swapped img src, so drop them first.
+        const originalSrc = img.dataset.original;
+        if (originalSrc && originalSrc !== img.src) {
+            img.closest('picture')?.querySelectorAll('source').forEach(s => s.remove());
+            img.src = originalSrc;
             return;
         }
 
-        // Mark as error and show placeholder or error state
+        // Mark as error
+        this.loadedImages.add(img);
         img.classList.add('error', 'loaded');
+
         if (wrapper) {
-            wrapper.classList.remove('loading');
-            wrapper.classList.add('error');
+            wrapper.classList.add('error', 'loaded');
+            wrapper.setAttribute('data-loading', 'error');
         }
 
-        // Keep placeholder visible for error state
-        if (placeholder) {
-            placeholder.style.opacity = '0.3';
-            placeholder.style.filter = 'blur(5px) grayscale(1)';
+        if (figure) {
+            figure.setAttribute('data-loading', 'error');
+        }
+
+        // Update skeleton to show error
+        if (skeleton) {
+            skeleton.classList.add('error');
+            skeleton.innerHTML = `
+                <div class="error-icon">⚠️</div>
+                <div class="error-text">Failed to load image</div>
+            `;
         }
 
         // Trigger custom event
         img.dispatchEvent(new CustomEvent('imageError', {
             bubbles: true,
-            detail: { src: img.dataset.src || img.src }
+            detail: { src: img.src }
         }));
     }
 
@@ -141,11 +174,30 @@ class ProgressiveImageLoader {
         const visibleImages = document.querySelectorAll('.main-image:not(.loaded)');
         visibleImages.forEach(img => {
             const rect = img.getBoundingClientRect();
-            const isVisible = rect.top < window.innerHeight && rect.bottom > 0;
+            const isVisible = rect.top < window.innerHeight + 100 && rect.bottom > -100;
 
             if (isVisible) {
                 this.loadImage(img);
             }
+        });
+    }
+
+    addGlobalEventListeners() {
+        // Listen for focus events on images for accessibility
+        document.addEventListener('focusin', (e) => {
+            if (e.target.classList.contains('main-image') && !e.target.classList.contains('loaded')) {
+                this.loadImage(e.target);
+            }
+        });
+
+        // Listen for user interaction to load images
+        ['click', 'touchstart'].forEach(eventType => {
+            document.addEventListener(eventType, (e) => {
+                const img = e.target.closest('.main-image');
+                if (img && !img.classList.contains('loaded')) {
+                    this.loadImage(img);
+                }
+            });
         });
     }
 
@@ -164,10 +216,10 @@ class ProgressiveImageLoader {
                         if (node.nodeType === 1) { // Element node
                             const newImages = node.querySelectorAll?.('.main-image[loading="lazy"]:not(.loaded)') || [];
                             newImages.forEach(img => {
-                                if (this.imageObserver) {
+                                if (this.imageObserver && !img.hasAttribute('data-observed')) {
                                     this.imageObserver.observe(img);
-                                    img.classList.add('observed');
-                                } else {
+                                    img.setAttribute('data-observed', 'true');
+                                } else if (!this.imageObserver) {
                                     this.loadImage(img);
                                 }
                             });
@@ -183,7 +235,7 @@ class ProgressiveImageLoader {
         }
     }
 
-    // Public methods for manual control
+    // Public methods
     forceLoad(selector) {
         const images = document.querySelectorAll(selector);
         images.forEach(img => this.loadImage(img));
@@ -196,43 +248,23 @@ class ProgressiveImageLoader {
             this.loadAllImages();
         }
     }
-}
 
-// Image format detection and optimization
-class ImageOptimizer {
-    constructor() {
-        this.supportsWebP = false;
-        this.supportsAVIF = false;
-        this.detectFormats();
-    }
-
-    detectFormats() {
-        // Test WebP support
-        const webp = new Image();
-        webp.onload = webp.onerror = () => {
-            this.supportsWebP = (webp.height === 2);
-            document.documentElement.classList.toggle('webp', this.supportsWebP);
-            document.documentElement.classList.toggle('no-webp', !this.supportsWebP);
+    getStats() {
+        return {
+            loadedImages: this.loadedImages.size,
+            totalImages: document.querySelectorAll('.main-image').length
         };
-        webp.src = 'data:image/webp;base64,UklGRjoAAABXRUJQVlA4IC4AAACyAgCdASoCAAIALmk0mk0iIiIiIgBoSygABc6WWgAA/veff/0PP8bA//LwYAAA';
-
-        // Test AVIF support
-        const avif = new Image();
-        avif.onload = avif.onerror = () => {
-            this.supportsAVIF = (avif.height === 2);
-            document.documentElement.classList.toggle('avif', this.supportsAVIF);
-        };
-        avif.src = 'data:image/avif;base64,AAAAIGZ0eXBhdmlmAAAAAGF2aWZtaWYxbWlhZk1BMUIAAADybWV0YQAAAAAAAAAoaGRscgAAAAAAAAAAcGljdAAAAAAAAAAAAAAAAGxpYmF2aWYAAAAADnBpdG0AAAAAAAEAAAAeaWxvYwAAAABEAAABAAEAAAABAAABGgAAAB0AAAAoaWluZgAAAAAAAQAAABppbmZlAgAAAAABAABhdjAxQ29sb3IAAAAAamlwcnAAAABLaXBjbwAAABRpc3BlAAAAAAAAAQAAAAEAAAAQcGl4aQAAAAADCAgIAAAAFmF1eEMAAAAAdXJuOm1wZWc6bXBlZ0I6Y2ljcAAAAAA=';
     }
 }
 
-// Performance monitoring
-class ImagePerformanceMonitor {
+// Performance monitoring for skeleton loading
+class SkeletonPerformanceMonitor {
     constructor() {
         this.metrics = {
             totalImages: 0,
             loadedImages: 0,
             errorImages: 0,
+            skeletonTimes: [],
             loadTimes: []
         };
 
@@ -248,21 +280,52 @@ class ImagePerformanceMonitor {
 
         document.addEventListener('imageError', (e) => {
             this.metrics.errorImages++;
-            console.warn('Image failed to load:', e.detail.src);
         });
 
         // Count total images on page
-        this.metrics.totalImages = document.querySelectorAll('img').length;
+        this.updateTotalCount();
+
+        // Monitor skeleton visibility duration
+        this.monitorSkeletonTimes();
+    }
+
+    updateTotalCount() {
+        this.metrics.totalImages = document.querySelectorAll('.main-image').length;
     }
 
     recordLoadTime(img) {
         if ('performance' in window && performance.getEntriesByName) {
             const entries = performance.getEntriesByName(img.src);
             if (entries.length > 0) {
-                const loadTime = entries[entries.length - 1].loadEventEnd - entries[entries.length - 1].startTime;
+                const entry = entries[entries.length - 1];
+                const loadTime = entry.responseEnd - entry.startTime;
                 this.metrics.loadTimes.push(loadTime);
             }
         }
+    }
+
+    monitorSkeletonTimes() {
+        const skeletons = document.querySelectorAll('.skeleton-loader');
+        skeletons.forEach(skeleton => {
+            const startTime = performance.now();
+            const observer = new MutationObserver((mutations) => {
+                mutations.forEach(mutation => {
+                    if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+                        const style = mutation.target.style;
+                        if (style.opacity === '0' || style.display === 'none') {
+                            const endTime = performance.now();
+                            this.metrics.skeletonTimes.push(endTime - startTime);
+                            observer.disconnect();
+                        }
+                    }
+                });
+            });
+
+            observer.observe(skeleton, {
+                attributes: true,
+                attributeFilter: ['style']
+            });
+        });
     }
 
     getStats() {
@@ -270,50 +333,58 @@ class ImagePerformanceMonitor {
             ? this.metrics.loadTimes.reduce((a, b) => a + b, 0) / this.metrics.loadTimes.length
             : 0;
 
+        const avgSkeletonTime = this.metrics.skeletonTimes.length > 0
+            ? this.metrics.skeletonTimes.reduce((a, b) => a + b, 0) / this.metrics.skeletonTimes.length
+            : 0;
+
         return {
             ...this.metrics,
             successRate: this.metrics.totalImages > 0 ? (this.metrics.loadedImages / this.metrics.totalImages) * 100 : 0,
-            averageLoadTime: avgLoadTime
+            averageLoadTime: avgLoadTime,
+            averageSkeletonTime: avgSkeletonTime
         };
     }
 }
 
-// Initialize everything when DOM is ready
+// Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
     // Check if user prefers reduced motion
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     if (!prefersReducedMotion) {
-        // Initialize progressive loading
-        window.progressiveImageLoader = new ProgressiveImageLoader();
-
-        // Initialize image optimization
-        window.imageOptimizer = new ImageOptimizer();
+        // Initialize skeleton loading
+        window.skeletonImageLoader = new SkeletonImageLoader();
 
         // Initialize performance monitoring (only in development)
         if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-            window.imagePerformanceMonitor = new ImagePerformanceMonitor();
+            window.skeletonPerformanceMonitor = new SkeletonPerformanceMonitor();
 
             // Log stats after 5 seconds
             setTimeout(() => {
-                console.log('Image Loading Stats:', window.imagePerformanceMonitor.getStats());
+                console.log('Skeleton Loading Stats:', window.skeletonPerformanceMonitor.getStats());
             }, 5000);
         }
     } else {
         // For users who prefer reduced motion, just load images normally
         document.querySelectorAll('.main-image').forEach(img => {
             img.classList.add('loaded');
-            const placeholder = img.previousElementSibling;
-            if (placeholder && placeholder.classList.contains('placeholder-image')) {
-                placeholder.style.display = 'none';
-            }
+            const wrapper = img.closest('.progressive-image-wrapper');
+            if (wrapper) wrapper.classList.add('loaded');
+
+            // Hide skeleton immediately
+            const skeleton = wrapper?.querySelector('.skeleton-loader');
+            if (skeleton) skeleton.style.display = 'none';
+
+            // Hide placeholder immediately
+            const placeholder = wrapper?.querySelector('.blur-placeholder');
+            if (placeholder) placeholder.style.display = 'none';
         });
     }
 });
 
 // Expose API for manual control
-window.imageLoader = {
-    forceLoad: (selector) => window.progressiveImageLoader?.forceLoad(selector),
-    refresh: () => window.progressiveImageLoader?.refresh(),
-    getStats: () => window.imagePerformanceMonitor?.getStats()
+window.skeletonLoader = {
+    forceLoad: (selector) => window.skeletonImageLoader?.forceLoad(selector),
+    refresh: () => window.skeletonImageLoader?.refresh(),
+    getStats: () => window.skeletonPerformanceMonitor?.getStats()
 };
