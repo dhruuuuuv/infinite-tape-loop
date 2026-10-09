@@ -168,7 +168,6 @@ figcaption { font-size: 13px; font-style: italic; color: var(--ink-soft); margin
 .journal .entry { margin: 0 0 44px; }
 .journal .entry .d { font-family: var(--mono); font-size: 12px; color: var(--ink-soft); margin: 0 0 10px; }
 .journal .entry img { display: block; width: 100%; max-width: 520px; height: auto; }
-.journal .entry .cap { font-size: 13.5px; font-style: italic; color: var(--pencil); margin: 8px 0 0; }
 
 /* ---------- seahorse ---------- */
 .shorse { border: none; background: none; padding: 0; cursor: pointer; display: inline-block; margin-top: 44px; position: relative; }
